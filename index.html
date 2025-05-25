@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tech Lead - [HC]</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Press+Start+2P&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0f23; /* Base dark blue */
+            color: #e0e0e0;
+            overflow-x: hidden;
+            position: relative; /* For pseudo-elements */
+        }
+
+        /* Futuristic Lab Background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-color: #0a0f23;
+            background-image:
+                linear-gradient(to right, rgba(0, 200, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 200, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px; /* Faint grid lines */
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 70% 30%, rgba(0, 100, 150, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 30% 70%, rgba(74, 59, 123, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(30, 17, 64, 0) 0%, rgba(42, 42, 87, 0.5) 70%, rgba(10,15,35,1) 100%);
+            opacity: 0.8;
+        }
+        
+        .bg-cosmic-gradient { /* This will be applied to sections, body handles the base lab */
+            background: linear-gradient(135deg, rgba(30, 17, 64, 0.8) 0%, rgba(42, 42, 87, 0.9) 50%, rgba(74, 59, 123, 0.8) 100%);
+        }
+
+        #workspace-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        #workspace-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+		#workspace {
+			display: block;
+			margin: auto;
+            will-change: transform;       /* ✅ Hint to Safari to GPU-accelerate */
+            backface-visibility: hidden;  /* ✅ Best for GPU acceleration        */
+            will-change: transform;       /* ✅ Hints browser to optimize        */
+            transform: translateZ(0);     /* ✅ Alternative GPU trigger          */
+		}
+
+		#home {
+			overflow: visible;
+		}
+
+        /* Glassmorphism effect for cards/containers */
+        .glass-effect {
+            background: rgba(30, 30, 60, 0.3); /* Darker, more techy glass */
+            backdrop-filter: blur(12px) saturate(150%);
+            -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border: 1px solid rgba(0, 196, 255, 0.2); /* Cyan border */
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .btn-primary {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #00c4ff; 
+            color: #ffffff;
+            padding: 12px 24px; 
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 2px solid #00c4ff;
+            box-shadow: 0 4px 15px rgba(0, 196, 255, 0.4);
+        }
+        .btn-primary:hover {
+            background-color: #00a0cc;
+            box-shadow: 0 6px 20px rgba(0, 196, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent;
+            color: #e0e0e0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(224, 224, 224, 0.1);
+            color: #ffffff;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stars-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -3; /* Adjusted z-index */
+            overflow: hidden; 
+        }
+        .star {
+            position: absolute; background-color: rgba(255,255,255,0.5); 
+            border-radius: 50%; animation: twinkle 7s infinite ease-in-out;
+        }
+        @keyframes twinkle { 
+            0%, 100% { opacity: 0.1; transform: scale(0.5); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        
+        .header-avatar {
+            width: 40px; /* Size for avatar in header */
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 196, 255, 0.7);
+        }
+        
+        .section-title {
+            font-family: 'Press Start 2P', cursive; margin-bottom: 2.5rem; 
+            text-align: center; font-size: 1.75rem; 
+        }
+        @media (min-width: 768px) { .section-title { font-size: 2.25rem; margin-bottom: 3rem; } }
+
+		#mobileMenuButton {
+			position: relative;
+			min-width: 20px;
+		}
+
+        /* Hero Robot (formerly clickableRobotIcon) Styles */
+        #heroRobotContainer { /* Container for positioning the robot and its popup */
+            position: relative; /* For popup positioning */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* width: 300px; /* Default size, adjust as needed */
+            /* height: 300px; */
+             margin-left: auto;
+             margin-right: auto;
+        }
+
+        #heroRobotSVG {
+            width: 200px; /* Increased size (approx 60px * 5 = 300px, 600% of 50px) */
+            height: 200px;
+            filter: drop-shadow(0px 5px 15px rgba(0,196,255,0.5));
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        #heroRobotSVG:hover {
+            transform: scale(1.05);
+        }
+
+        @media (min-width: 640px) { 
+            #heroRobotSVG { width: 280px; height: 280px; }
+        }
+        @media (min-width: 768px) { 
+            #heroRobotSVG { width: 320px; height: 320px; }
+        }
+        @media (min-width: 1024px) { 
+            #heroRobotSVG { width: 400px; height: 400px; }
+        }
+
+        /* AI Greeting Popup Styles (relative to heroRobotContainer) */
+        #aiGreetingPopup {
+			position: absolute;
+			bottom: calc(100% - 20px); /* Position above the robot with some spacing */
+			left: 50%;
+            transform: translateX(-50%) translateY(-10px) scale(0.95); /* Center above and slightly up */
+            padding: 15px 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            font-size: 0.9rem;
+			min-width: 200px;
+            max-width: 320px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            pointer-events: none; /* Initially not interactive until visible */
+        }
+        #aiGreetingPopup.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-20px) scale(1); /* Adjust Y for spacing */
+            pointer-events: auto;
+        }
+        #aiGreetingPopup .close-btn {
+            position: absolute; top: 5px; right: 5px; background: none; border: none;
+            color: #aaa; font-size: 1.2rem; cursor: pointer; padding: 2px;
+        }
+        #aiGreetingPopup .close-btn:hover { color: #fff; }
+
+
+        h1 { font-size: 2.25rem; line-height: 1.2; } 
+        p { font-size: 0.95rem; line-height: 1.6; } 
+        @media (min-width: 640px) { h1 { font-size: 2.75rem; } p { font-size: 1rem; } }
+        @media (min-width: 768px) { h1 { font-size: 3rem; } }
+        @media (min-width: 1024px) { h1 { font-size: 3.75rem; } }
+
+        .card-grid { display: grid; gap: 1.5rem; }
+        @media (min-width: 768px) { .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; } }
+        @media (min-width: 1024px) { .card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+		
+		.btn-primary { word-wrap: break-word}
+    </style>
+    </head>
+    
+    <body>
+        <div class="stars-bg" id="starsContainer"></div>
+
+        <header
+            class="py-3 md:py-4 fixed top-0 left-0 right-0 z-50 glass-effect shadow-lg">
+            <div
+                class="container mx-auto px-4 flex justify-between items-center">
+                <div class="text-lg md:text-xl font-bold text-white"
+                    style="font-family: 'Press Start 2P', cursive;">
+                    [HC]<span class="text-cyan-400"> SECURE DEV</span>
+                </div>
+                <div class="flex items-center pr-4">
+                    <nav class="hidden md:flex space-x-4 lg:space-x-6 mr-4">
+                        <a href="#home"
+                            class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">Home</a>
+                        <a href="#expertise"
+                            class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">Expertise</a>
+                        <a href="#projects"
+                            class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">Projects</a>
+                        <a href="#approach"
+                            class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">Approach</a>
+                        <a href="#contact"
+                            class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">Contact</a>
+                    </nav>
+                    <img
+                        src="https://media.licdn.com/dms/image/v2/D5603AQGxlZfXA92Xiw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1718265367351?e=2147483647&v=beta&t=uIjGFjPf2-J9HRMH93aes06KyyquPebNU3O3oRulqec"
+                        alt="HC"
+                        class="header-avatar hidden md:block mr-4"
+                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/003366/e0e0e0?text=Me';">
+                </div>
+                <button id="mobileMenuButton"
+                    class="md:hidden text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"><path
+                            stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+            <div id="mobileMenu"
+                class="hidden md:hidden bg-gray-800 bg-opacity-95 py-2">
+                <div class="flex justify-center my-2">
+                    <img src="https://media.licdn.com/dms/image/v2/D5603AQGxlZfXA92Xiw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1718265367351?e=2147483647&v=beta&t=uIjGFjPf2-J9HRMH93aes06KyyquPebNU3O3oRulqec"
+                        alt="Your Avatar"
+                        class="header-avatar block md:hidden w-16 h-16"
+                        onerror="this.onerror=null; this.src='https://placehold.co/80x80/003366/e0e0e0?text=Me';">
+                </div>
+                <a href="#home"
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white text-center">Home</a>
+                <a href="#expertise"
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white text-center">Expertise</a>
+                <a href="#projects"
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white text-center">Projects</a>
+                <a href="#approach"
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white text-center">Approach</a>
+                <a href="#contact"
+                    class="block px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white text-center">Contact</a>
+            </div>
+        </header>
+
+        <main>
+
+            <!-- Image background -->
+            <section id="workspace-container" class="pt-16 md:pt-20">
+                <svg id="workspace" viewBox="0 0 800 600" style="width: 100%; max-height: 100vh;">
+                    <image
+                        xlink:href="https://cdnb.artstation.com/p/assets/images/images/058/670/031/original/josue-pimenta-retro-computer.gif?1674689993"
+                        width="800" height="600" />
+                    <a target="_blank" href="#">
+                        <rect x="420" y="460" width="50" height="50"
+                            fill="transparent" stroke="rgba(0, 255, 255, 0.7)"
+                            stroke-width="0"
+                            style="cursor: pointer; pointer-events: all;" />
+                    </a>
+                </svg>
+            </section>
+
+            <!-- Video background -->
+            <!-- <section id="workspace-container" style="position: relative;">
+                <video id="workspace" autoplay loop muted playsinline style="position: absolute; width: 100%; max-height: 78%;">
+                    <source src="旅行Mimo - HoYoLAB and 47 more pages - hc - Microsoft​ Edge 2025-05-10 13-53-04.mp4" type="video/mp4">
+                </video>
+                
+                <svg viewBox="0 0 800 450" style="position: relative; z-index: 1;">
+                    <rect width="800" height="450" fill="transparent"/>
+                    
+                    <a target="_blank" href="page/s.html">
+                        <rect x="350" y="160" width="100" height="150"
+                            fill="transparent" stroke="rgba(0, 255, 255, 0.7)"
+                            stroke-width="0"
+                            style="cursor: pointer; pointer-events: all;" />
+                    </a>
+                </svg>
+            </section> -->
+
+            <section id="home"
+                class="min-h-screen flex flex-col items-center justify-center text-center px-4 py-12 md:py-16 bg-cosmic-gradient relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10"></div>
+                <div
+                    class="container mx-auto flex flex-col lg:flex-row items-center justify-center lg:justify-around z-10">
+                    <div
+                        class="px-4 lg:w-3/5 xl:w-1/2 mb-10 lg:mb-0 lg:text-left fade-in-up order-2 lg:order-1"
+                        style="animation-delay: 0.2s;">
+                        <h1
+                            class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+                            style="font-family: 'Press Start 2P', cursive;">
+                            <span class="text-cyan-400">DEVSECOPS</span> & <br
+                                class="hidden sm:block"> BACKEND ARCHITECT
+                        </h1>
+                        <p
+                            class="text-md sm:text-lg md:text-xl text-gray-300 mb-8">
+                            Greetings! I'm HC, a Tech Lead
+                            with 9+ years of experience in the tech field specializing in robust backend systems and
+                            integrating security throughout the development
+                            lifecycle (DevSecOps). I engineer resilient,
+                            scalable, and secure digital infrastructures.
+                        </p>
+                        <div
+                            class="space-y-3 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row justify-center lg:justify-start">
+                            <a href="#projects"
+                                class="btn-primary inline-block w-full sm:w-auto">Explore
+                                My Work</a>
+                            <a href="#contact"
+                                class="btn-secondary inline-block w-full sm:w-auto">Connect
+                                With Me</a>
+                        </div>
+                    </div>
+                    <div id="heroRobotContainer"
+                        class="lg:w-2/5 xl:w-1/2 flex justify-center items-center fade-in-up order-1 lg:order-2 mb-12 lg:mb-0"
+                        style="animation-delay: 0.5s;">
+                        <svg id="heroRobotSVG" viewBox="0 0 100 100"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="35" width="60" height="50" rx="10"
+                                fill="#222B3E" stroke="#00C4FF"
+                                stroke-width="2" />
+                            <rect x="30" y="15" width="40" height="30" rx="5"
+                                fill="#304060" stroke="#00C4FF"
+                                stroke-width="2" />
+                            <rect x="35" y="20" width="30" height="15" rx="3"
+                                fill="#0A0F23" />
+                            <ellipse cx="50" cy="27.5" rx="10" ry="4"
+                                fill="#00C4FF">
+                                <animate attributeName="rx"
+                                    values="10;12;10;12;10" dur="2s"
+                                    repeatCount="indefinite" />
+                                <animate attributeName="opacity"
+                                    values="0.7;1;0.7;1;0.7" dur="2s"
+                                    repeatCount="indefinite" />
+                            </ellipse>
+                            <line x1="50" y1="15" x2="50" y2="5"
+                                stroke="#00C4FF" stroke-width="2" />
+                            <circle cx="50" cy="5" r="3" fill="#00C4FF">
+                                <animate attributeName="r" values="3;4;3"
+                                    dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                            <rect x="10" y="45" width="10" height="25" rx="3"
+                                fill="#304060" stroke="#00C4FF"
+                                stroke-width="1.5" />
+                            <rect x="80" y="45" width="10" height="25" rx="3"
+                                fill="#304060" stroke="#00C4FF"
+                                stroke-width="1.5" />
+                            <rect x="25" y="85" width="20" height="10" rx="3"
+                                fill="#304060" stroke="#00C4FF"
+                                stroke-width="1.5" />
+                            <rect x="55" y="85" width="20" height="10" rx="3"
+                                fill="#304060" stroke="#00C4FF"
+                                stroke-width="1.5" />
+                        </svg>
+                        <div id="aiGreetingPopup" class="glass-effect">
+                            <p id="aiGreetingMessage">Initializing greeting
+                                protocols...</p>
+                            <button id="closeAiGreetingPopup" class="close-btn"
+                                aria-label="Close greeting">&times;</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="expertise"
+                class="py-12 md:py-20 bg-opacity-50 bg-gray-900">
+                <div class="container mx-auto px-4">
+                    <h2
+                        class="section-title text-3xl md:text-4xl text-yellow-400 fade-in-up">Core
+                        Expertise</h2>
+                    <div class="card-grid">
+                        <div
+                            class="glass-effect p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 fade-in-up"
+                            style="animation-delay: 0.2s;">
+                            <img
+                                src="https://placehold.co/100x100/00c4ff/ffffff?text=🛡️"
+                                alt="DevSecOps Icon"
+                                class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full border-2 border-cyan-400 p-2"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/00c4ff/ffffff?text=DS';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-3 text-center text-cyan-300">DevSecOps
+                                Implementation</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Embedding
+                                security best practices (SAST, DAST, IAST),
+                                automating security pipelines, and fostering a
+                                security-first culture.</p>
+                        </div>
+                        <div
+                            class="glass-effect p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 fade-in-up"
+                            style="animation-delay: 0.4s;">
+                            <img
+                                src="https://placehold.co/100x100/ff6ac1/ffffff?text=⚙️"
+                                alt="Backend Architecture Icon"
+                                class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full border-2 border-pink-400 p-2"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/ff6ac1/ffffff?text=BA';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-3 text-center text-pink-300">Scalable
+                                Backend Systems</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Designing
+                                and developing microservices, APIs
+                                (REST/GraphQL), and data persistence layers with
+                                high availability and performance. (e.g.,
+                                Python, Go, Node.js, Java, SQL/NoSQL DBs)</p>
+                        </div>
+                        <div
+                            class="glass-effect p-6 rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 fade-in-up"
+                            style="animation-delay: 0.6s;">
+                            <img
+                                src="https://placehold.co/100x100/c1ff6a/333333?text=☁️"
+                                alt="Cloud & Automation Icon"
+                                class="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-full border-2 border-green-400 p-2"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/c1ff6a/333333?text=CA';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-3 text-center text-green-300">Cloud
+                                & CI/CD Automation</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Leveraging
+                                cloud platforms (AWS, Azure, GCP),
+                                containerization (Docker, Kubernetes), and IaC
+                                (Terraform) for automated, resilient
+                                deployments.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="projects" class="py-12 md:py-20 bg-cosmic-gradient">
+                <div class="container mx-auto px-4">
+                    <h2
+                        class="section-title text-3xl md:text-4xl text-purple-400 fade-in-up">
+                        Highlighted Projects
+                    </h2>
+                    <div class="card-grid">
+                        <div
+                            class="glass-effect p-4 rounded-lg text-center transform hover:scale-105 transition-transform duration-300 fade-in-up"
+                            style="animation-delay: 0.2s;">
+                            <img
+                                src="https://placehold.co/300x200/a068ff/ffffff?text=Secure+API+Gateway"
+                                alt="Secure API Gateway Project"
+                                class="w-full h-40 md:h-48 object-cover rounded-md mb-4"
+                                onerror="this.onerror=null; this.src='https://placehold.co/300x200/a068ff/ffffff?text=P1';">
+                            <h4
+                                class="text-md md:text-lg font-semibold text-purple-300">Secure
+                                API Gateway Implementation</h4>
+                            <p class="text-xs text-gray-400">Led the design and
+                                deployment of a company-wide secure API gateway,
+                                enhancing threat protection and centralizing
+                                access control.</p>
+                        </div>
+                        <div
+                            class="glass-effect p-4 rounded-lg text-center transform hover:scale-105 transition-transform duration-300 fade-in-up"
+                            style="animation-delay: 0.4s;">
+                            <img
+                                src="https://placehold.co/300x200/ff6ac1/ffffff?text=Automated+Compliance"
+                                alt="Automated Compliance Project"
+                                class="w-full h-40 md:h-48 object-cover rounded-md mb-4"
+                                onerror="this.onerror=null; this.src='https://placehold.co/300x200/ff6ac1/ffffff?text=P2';">
+                            <h4
+                                class="text-md md:text-lg font-semibold text-pink-300">Automated
+                                Compliance Engine</h4>
+                            <p class="text-xs text-gray-400">Developed a backend
+                                system for automated security compliance checks
+                                and reporting, significantly reducing manual
+                                audit efforts.</p>
+                        </div>
+                        <div
+                            class="glass-effect p-4 rounded-lg text-center transform hover:scale-105 transition-transform duration-300 fade-in-up"
+                            style="animation-delay: 0.6s;">
+                            <img
+                                src="https://placehold.co/300x200/6ac1ff/ffffff?text=Microservice+Refactor"
+                                alt="Microservice Refactor Project"
+                                class="w-full h-40 md:h-48 object-cover rounded-md mb-4"
+                                onerror="this.onerror=null; this.src='https://placehold.co/300x200/6ac1ff/ffffff?text=P3';">
+                            <h4
+                                class="text-md md:text-lg font-semibold text-blue-300">Monolith
+                                to Microservices Refactor</h4>
+                            <p class="text-xs text-gray-400">Spearheaded the
+                                secure refactoring of a monolithic backend into
+                                scalable microservices, improving resilience and
+                                deployment speed.</p>
+                        </div>
+                        <div
+                            class="glass-effect p-4 rounded-lg text-center transform hover:scale-105 transition-transform duration-300 fade-in-up"
+                            style="animation-delay: 0.6s;">
+                            <a target="_blank" href="https://htmlpreview.github.io/?https://github.com/techleadhc/totp/blob/main/totp.html">
+                            <img
+                                src="https://placehold.co/300x200/999999/ffffff?text=TOTP Generator"
+                                alt="Online TOTP Generator"
+                                class="w-full h-40 md:h-48 object-cover rounded-md mb-4"
+                                onerror="this.onerror=null; this.src='https://placehold.co/300x200/6ac1ff/ffffff?text=P3';">
+                            </a>
+                            <h4
+                                class="text-md md:text-lg font-semibold text-blue-300">
+                                Online TOTP Generator
+                            </h4>
+                            <p class="text-xs text-gray-400">Easily create and manage 
+                                multiple secure time-based one-time passwords 
+                                wherever you go. 🔐✨.</p>
+                        </div>
+                        <div
+                            class="glass-effect p-4 rounded-lg text-center transform hover:scale-105 transition-transform duration-300 fade-in-up"
+                            style="animation-delay: 0.6s;">
+                            <a target="_blank" href="https://htmlpreview.github.io/?https://github.com/techleadhc/aes-gcm/blob/main/aes/sjcl/aes.html">
+                                <img
+                                    src="https://placehold.co/300x200/222222/00ff99?text=AES-GCM+Crypto"
+                                    alt="AES-GCM Encryption Tool"
+                                    class="w-full h-40 md:h-48 object-cover rounded-md mb-4"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/300x200/6ac1ff/ffffff?text=P3';">
+                            </a>
+                            <h4 class="text-md md:text-lg font-semibold text-green-300">
+                                AES-GCM Encryption Tool
+                            </h4>
+                            <p class="text-xs text-gray-400">
+                                Secure encryption using AES-GCM with the SJCL library. Designed to withstand 
+                                strong offline brute-force attacks. 🔒✨
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="approach"
+                class="py-12 md:py-20 bg-opacity-70 bg-gray-900">
+                <div class="container mx-auto px-4">
+                    <h2
+                        class="section-title text-3xl md:text-4xl text-teal-300 fade-in-up">My
+                        Technical Approach</h2>
+                    <div class="card-grid">
+                        <div
+                            class="glass-effect rounded-lg overflow-hidden shadow-lg p-6 fade-in-up"
+                            style="animation-delay: 0.2s;">
+                            <img
+                                src="https://placehold.co/100x100/2dd4bf/ffffff?text=🔒"
+                                alt="Security by Design Icon"
+                                class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 rounded-full border-2 border-teal-400 p-1"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/2dd4bf/ffffff?text=SBD';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-2 text-center text-teal-300">Security
+                                by Design</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Prioritizing
+                                security considerations from the earliest stages
+                                of development, not as an afterthought.
+                                Proactive threat modeling and risk
+                                assessment.</p>
+                        </div>
+                        <div
+                            class="glass-effect rounded-lg overflow-hidden shadow-lg p-6 fade-in-up"
+                            style="animation-delay: 0.4s;">
+                            <img
+                                src="https://placehold.co/100x100/f472b6/ffffff?text=🔄"
+                                alt="Continuous Improvement Icon"
+                                class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 rounded-full border-2 border-pink-400 p-1"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/f472b6/ffffff?text=CI';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-2 text-center text-pink-300">Automate
+                                Everything Sensible</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Leveraging
+                                automation for testing, deployment, security
+                                checks, and infrastructure management to ensure
+                                consistency and speed.</p>
+                        </div>
+                        <div
+                            class="glass-effect rounded-lg overflow-hidden shadow-lg p-6 fade-in-up"
+                            style="animation-delay: 0.6s;">
+                            <img
+                                src="https://placehold.co/100x100/fbbf24/ffffff?text=📈"
+                                alt="Data-Driven Decisions Icon"
+                                class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 rounded-full border-2 border-yellow-400 p-1"
+                                onerror="this.onerror=null; this.src='https://placehold.co/100x100/fbbf24/ffffff?text=DDD';">
+                            <h3
+                                class="text-lg md:text-xl font-semibold mb-2 text-center text-yellow-300">Pragmatic
+                                & Resilient Solutions</h3>
+                            <p
+                                class="text-gray-400 text-sm text-center">Building
+                                robust, maintainable systems that solve
+                                real-world problems effectively, focusing on
+                                long-term stability and scalability.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="py-12 md:py-20 bg-cosmic-gradient">
+                <div class="container mx-auto px-4 text-center">
+                    <h2
+                        class="section-title text-3xl md:text-4xl text-green-400 fade-in-up">Let's
+                        Collaborate</h2>
+                    <p
+                        class="text-md sm:text-lg md:text-xl text-gray-300 mb-8 fade-in-up"
+                        style="animation-delay: 0.2s;">
+                        Seeking expertise in DevSecOps, backend architecture, or
+                        secure system design? <br class="hidden sm:block"> Let's
+                        discuss how I can help elevate your projects.
+                    </p>
+                    <div class="fade-in-up email"
+                        style="animation-delay: 0.4s;">
+                        <a href="mailto:techlead@outlook.my"
+                            class="btn-primary block text-base md:text-lg mb-4 sm:mb-0">Email:
+                            techlead@outlook.my</a>
+                        <p class="mt-6 text-gray-400 text-sm">Connect on:
+                            <a target="_blank" href="https://linkedin.com/in/huichung/"
+                                class="text-cyan-400 hover:text-cyan-300 underline mx-1 cursor-pointer">LinkedIn</a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="py-6 md:py-10 text-center bg-gray-900 bg-opacity-80">
+            <div class="container mx-auto px-4">
+                <p class="text-gray-400 text-sm mb-2">&copy; 2025 [HC]. Architecting Secure Futures.</p>
+                <p class="text-xs text-gray-500">Built with secure code and
+                    Tailwind CSS.</p>
+                <div class="mt-4 space-x-4">
+                    <a href="#home"
+                        class="text-gray-400 hover:text-white text-xs">Back to
+                        Top</a>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // DOM Elements
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const starsContainer = document.getElementById('starsContainer');
+            const animatedElements = document.querySelectorAll('.fade-in-up');
+            
+            const heroRobotSVG = document.getElementById('heroRobotSVG'); // Changed from clickableRobotIcon
+            const aiGreetingPopup = document.getElementById('aiGreetingPopup');
+            const aiGreetingMessage = document.getElementById('aiGreetingMessage');
+            const closeAiGreetingPopup = document.getElementById('closeAiGreetingPopup');
+
+            // Greetings Array
+            const greetings = [
+                "Welcome! Systems online. All secure!",
+                "Hey there! Ready to architect some amazing apps?",
+                "Greetings, human! My sensors detect high levels of awesome.",
+                "01000010 01100101 01100101 01110000 00100000 01000010 01101111 01101111 01110000 00100001 (Beep Boop!)", 
+                "Initializing portfolio protocols... Welcome aboard!",
+                "Psst... I've double-checked the security matrix. All clear!",
+                "Threat scan negative. You're free to explore this digital domain!",
+                "My core programming indicates you're seeking a top-tier Tech Lead. You've arrived!"
+            ];
+            let currentGreeting = greetings[Math.floor(Math.random() * greetings.length)]; 
+            let greetingIntervalId; // To store the interval ID
+
+            // --- Mobile Menu ---
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // --- Smooth Scrolling ---
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const headerOffset = document.querySelector('header').offsetHeight || 70;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+
+            // --- Star Generation ---
+            const numberOfStars = 50; 
+            if (starsContainer) {
+                for (let i = 0; i < numberOfStars; i++) {
+                    let star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = `${Math.random() * 1 + 0.5}px`; 
+                    star.style.height = star.style.width;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    star.style.animationDuration = `${Math.random() * 5 + 5}s`; 
+                    star.style.animationDelay = `${Math.random() * 5}s`; 
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            // --- Intersection Observer for Fade-in Animations ---
+            const observerOptions = { threshold: 0.05, rootMargin: "0px 0px -50px 0px" };
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1'; 
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            animatedElements.forEach(el => { observer.observe(el); });
+
+            // --- AI Greeting Assistant Logic (for Hero Robot) ---
+            function updateGreetingMessage() {
+                currentGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+                if (aiGreetingPopup.classList.contains('visible')) {
+                    aiGreetingMessage.textContent = currentGreeting;
+                }
+            }
+
+            function showGreetingPopup() {
+                if (aiGreetingPopup && aiGreetingMessage) {
+                    aiGreetingMessage.textContent = currentGreeting; 
+                    aiGreetingPopup.classList.add('visible');
+                }
+            }
+
+            function hideGreetingPopup() {
+                if (aiGreetingPopup) {
+                    aiGreetingPopup.classList.remove('visible');
+                }
+            }
+            
+            if (heroRobotSVG) { // Event listener now on the main hero robot SVG
+                heroRobotSVG.addEventListener('click', () => {
+                    if (aiGreetingPopup.classList.contains('visible')) {
+                        hideGreetingPopup();
+                    } else {
+                        showGreetingPopup();
+                    }
+                });
+            }
+
+            if (closeAiGreetingPopup) {
+                closeAiGreetingPopup.addEventListener('click', hideGreetingPopup);
+            }
+
+            // Update greeting text every 10 seconds
+            updateGreetingMessage(); // Set initial greeting message
+            greetingIntervalId = setInterval(updateGreetingMessage, 10000); // 10 seconds
+
+        </script>
+
+        <script>
+            // Scroll to #home when page loads
+            window.onload = function() {
+                const homeSection = document.getElementById('home');
+                if (homeSection) {
+                homeSection.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                homeSection.focus();
+            };
+        </script>
+
+        <script>
+            const SECRET_WORD = "console";
+            const hiddenElement = document.getElementById("workspace-container");
+
+            // Track typed characters
+            let typedLetters = [];
+
+            // Listen for key presses
+            document.addEventListener("keydown", (e) => {
+            // Ignore modifier keys (Shift, Ctrl, Alt, etc.)
+            if (e.key.length === 1 || e.key === "Backspace") {
+                if (e.key === "Backspace") {
+                // Remove last letter if Backspace is pressed
+                typedLetters.pop();
+                } else {
+                // Add typed letter to the array
+                typedLetters.push(e.key.toLowerCase());
+                }
+
+                // Check if the last N letters match SECRET_WORD
+                const typedWord = typedLetters.slice(-SECRET_WORD.length).join("");
+                if (typedWord === SECRET_WORD) {
+                    // Unhide the element
+                    hiddenElement.style.display = "block";
+
+                    setTimeout(() => {
+                        hiddenElement.classList.add("show"); // Start transition after delay
+                        setTimeout(() => {
+                            hiddenElement.style.transition = "none"; // Remove transition after animation finishes
+                        }, 1000); // Delay should match the CSS transition duration
+                    }, 300); // Initial delay before showing
+
+                    console.log("Console revealed~");
+
+                    // add parallax effect
+                    const bg = document.querySelector('#workspace-container');
+                    bg.style.willChange = 'transform'; // Pre-optimize
+
+                    let lastScrollY = 0;
+                    let ticking = false;
+
+                    function updateBgPosition() {
+                        bg.style.transform = `translate3d(0, ${lastScrollY * 0.3}px, 0)`;
+                        ticking = false;
+                    }
+
+                    window.addEventListener('scroll', () => {
+                    lastScrollY = window.scrollY;
+                    if (!ticking) {
+                        requestAnimationFrame(updateBgPosition);
+                        ticking = true;
+                    }
+                    }, { passive: true }); // Improves scrolling performance
+
+                    
+                    // Reset typed letters (optional)
+                    typedLetters = [];
+                }
+            }
+            });
+        </script>
+
+    </body>
+</html>
